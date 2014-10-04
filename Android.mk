@@ -52,12 +52,18 @@ LOCAL_STATIC_LIBRARIES := \
     libselinux \
     libstdc++ \
     libm \
-    libc
+    libc \
+    libmake_f2fs
 
 ifeq ($(TARGET_USERIMAGES_USE_EXT4), true)
     LOCAL_CFLAGS += -DUSE_EXT4
     LOCAL_C_INCLUDES += system/extras/ext4_utils
     LOCAL_STATIC_LIBRARIES += libext4_utils_static libz
+endif
+ifeq ($(TARGET_USERIMAGES_USE_F2FS), true)
+    LOCAL_CFLAGS += -DUSE_F2FS
+    LOCAL_C_INCLUDES += external/f2fs-tools
+    LOCAL_STATIC_LIBRARIES += libmake_f2fs
 endif
 
 # This binary is in the recovery ramdisk, which is otherwise a copy of root.

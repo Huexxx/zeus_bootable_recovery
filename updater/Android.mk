@@ -26,6 +26,11 @@ LOCAL_STATIC_LIBRARIES += \
     libsparse_static \
     libz
 endif
+ifeq ($(TARGET_USERIMAGES_USE_F2FS), true)
+LOCAL_CFLAGS += -DUSE_F2FS
+LOCAL_C_INCLUDES += external/f2fs-tools
+LOCAL_STATIC_LIBRARIES += libmake_f2fs
+endif
 
 LOCAL_STATIC_LIBRARIES += $(TARGET_RECOVERY_UPDATER_LIBS) $(TARGET_RECOVERY_UPDATER_EXTRA_LIBS)
 LOCAL_STATIC_LIBRARIES += libapplypatch libedify libmtdutils libminzip libz

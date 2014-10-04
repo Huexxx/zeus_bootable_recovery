@@ -49,11 +49,15 @@
 #ifdef USE_EXT4
 #include "make_ext4fs.h"
 #endif
+#ifdef USE_F2FS
+#include "mkfs/f2fs_format_utils.h"
+#endif
 
 // mount(fs_type, partition_type, location, mount_point)
 //
 //    fs_type="yaffs2" partition_type="MTD"     location=partition
 //    fs_type="ext4"   partition_type="EMMC"    location=device
+//    fs_type="f2fs"   partition_type="EMMC"    location=device
 Value* MountFn(const char* name, State* state, int argc, Expr* argv[]) {
     char* result = NULL;
     if (argc != 4) {
@@ -200,7 +204,8 @@ done:
 //
 //    fs_type="yaffs2" partition_type="MTD"     location=partition fs_size=<bytes> mount_point=<location>
 //    fs_type="ext4"   partition_type="EMMC"    location=device    fs_size=<bytes> mount_point=<location>
-//    if fs_size == 0, then make_ext4fs uses the entire partition.
+//    fs_type="f2fs"   partition_type="EMMC"    location=device    fs_size=<bytes> mount_point=<location>
+//    if fs_size == 0, then make_ext4fs/make_f2fs uses the entire partition.
 //    if fs_size > 0, that is the size to use
 //    if fs_size < 0, then reserve that many bytes at the end of the partition
 Value* FormatFn(const char* name, State* state, int argc, Expr* argv[]) {
@@ -269,6 +274,17 @@ Value* FormatFn(const char* name, State* state, int argc, Expr* argv[]) {
         int status = make_ext4fs(location, atoll(fs_size), mount_point, sehandle);
         if (status != 0) {
             printf("%s: make_ext4fs failed (%d) on %s",
+                    name, status, location);
+            result = strdup("");
+            goto done;
+        }
+        result = location;
+#endif
+#ifdef USE_F2FS
+    } else if (strcmp(fs_type, "f2fs") == 0) {
+        int status = make_f2fs(location);
+        if (status != 0) {
+            printf("%s: make_f2fs failed (%d) on %s",
                     name, status, location);
             result = strdup("");
             goto done;
